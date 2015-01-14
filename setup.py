@@ -7,7 +7,7 @@ setup(
     version='0.1.0',
     author='Janilton Maciel',
     author_email='janilton@outlook.com',
-    packages=['code_quality_tools'],
+    packages=['fab_utils'],
     license='GPL',
     url='https://github.com/janiltonmaciel/fab_utils',
     description='Uma coleção de funcionalidades para deploy via fabric',
