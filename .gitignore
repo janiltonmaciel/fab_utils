@@ -13,9 +13,5 @@ log/*.log
 .DS_Store
 */*.DS_Store
 db
-droffice/Lib
-droffice/Include
-droffice/Scripts
-droffice/media/*
 .idea*
-droffice.db
+build/
