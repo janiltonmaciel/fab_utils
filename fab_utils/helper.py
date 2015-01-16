@@ -15,7 +15,7 @@ from fabric.operations import sudo
 
 @task
 @roles('be')
-def setup():
+def init():
     """
         Setup inicial de deploy
     """
@@ -107,9 +107,15 @@ def clone_project(timestamp):
 @roles('be')
 def pip_install():
     if not exists(env.virtualenv_dir):
-        # run('source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv %s' % env.appname)
         run('virtualenv %s' % env.virtualenv_dir)
     run('source %s/bin/activate; pip install -r %s/requirements.txt --no-deps' % (env.virtualenv_dir, env.current_dir))
+
+
+@roles('be')
+def nginx():
+    nginx_current_conf = "%s/conf/nginx/*" % env.current_dir
+    sudo("cp %s %s" % (nginx_current_conf, env.nginx_dir))
+    sudo("nginx -c %s/nginx.conf" % env.nginx_dir)
 
 
 @roles('be')
@@ -120,4 +126,14 @@ def supervisor(supervisor_conf_dir):
     sudo('sudo supervisorctl update')
     sudo('sudo sysv-rc-conf supervisor on')
     sudo('supervisorctl reload admin')
+
+
+@roles('be')
+def create_directories(directories=None):
+    if directories == None:
+        directories = env.create_directories
+
+    for folder in directories:
+        if not exists(folder):
+            run('mkdir -p %s' % folder)
 
