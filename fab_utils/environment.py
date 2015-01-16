@@ -19,21 +19,3 @@ class Environment(Task):
             env.roles = list(args)
         else:
             abort("The following specified roles do not exist:\n    %s" % ', '.join(diff))
-
-
-class Development(Environment):
-    name = 'dev'
-    roledefs = {
-        'be': ['127.0.0.1:2222']
-    }
-
-
-class Production(Environment):
-    name = 'prod'
-    roledefs = {
-        'be': ['drcare.rafaelpena.com.br']
-    }
-
-
-dev = Development()
-prod = Production()
