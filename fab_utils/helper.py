@@ -20,8 +20,6 @@ def setup():
         Setup inicial de deploy
     """
     run('mkdir -p %s' % env.releases_dir)
-    run('chmod g+w %s' % env.releases_dir)
-
     execute(cleanup)
 
 
@@ -107,11 +105,11 @@ def clone_project(timestamp):
 
 
 @roles('be')
-def pip_install(timestamp):
+def pip_install():
     if not exists(env.virtualenv_dir):
-        run('source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv %s' % env.appname)
-
-    run('workon %s; pip install -r %s/%s/requirements.txt --no-deps' % (env.appname, env.releases_dir, timestamp))
+        # run('source /usr/local/bin/virtualenvwrapper.sh; mkvirtualenv %s' % env.appname)
+        run('virtualenv %s' % env.virtualenv_dir)
+    run('source %s/bin/activate; pip install -r %s/requirements.txt --no-deps' % (env.virtualenv_dir, env.current_dir))
 
 
 @roles('be')
