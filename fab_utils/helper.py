@@ -93,6 +93,7 @@ def rollback():
         run('rm -rf %s' % os.path.join(env.releases_dir, current_timestamp))
 
 
+@task
 @roles('be')
 def clone_project(timestamp):
     if exists(env.source_dir + '/.git'):
@@ -104,6 +105,7 @@ def clone_project(timestamp):
     run('cd %s && git archive --format=tar --prefix=%s/ HEAD | (cd %s && tar xf -)' % (env.source_dir, timestamp, env.releases_dir))
 
 
+@task
 @roles('be')
 def pip_install():
     if not exists(env.virtualenv_dir):
@@ -111,6 +113,7 @@ def pip_install():
     run('source %s/bin/activate; pip install -r %s/requirements.txt --no-deps' % (env.virtualenv_dir, env.current_dir))
 
 
+@task
 @roles('be')
 def nginx():
     nginx_current_conf = "%s/conf/nginx/*" % env.current_dir
@@ -118,6 +121,7 @@ def nginx():
     sudo("nginx -c %s/nginx.conf" % env.nginx_dir)
 
 
+@task
 @roles('be')
 def supervisor(supervisor_conf_dir):
     # run('mkdir -p %s' % env.releases_dir, use_sudo=True)
@@ -137,3 +141,12 @@ def create_directories(directories=None):
         if not exists(folder):
             run('mkdir -p %s' % folder)
 
+
+@task
+@roles('be')
+def create_user():
+    env.user = 'root'
+    sudo('adduser dreasy')
+    sudo('gpasswd -a dreasy sudo')
+    sudo('mkdir /opt/dreasy')
+    sudo('chown dreasy:dreasy /opt/dreasy')
