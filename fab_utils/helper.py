@@ -31,7 +31,7 @@ def cleanup():
     """
     remove = releases()[env.keep:]
     if remove:
-        run('rm -rf %s/{%s}' % (env.releases_dir, ','.join(remove)))
+        run('rm -rf %s/%s' % (env.releases_dir, ','.join(remove)))
 
 
 @task
@@ -123,13 +123,13 @@ def nginx():
 
 @task
 @roles('be')
-def supervisor(supervisor_conf_dir):
-    # run('mkdir -p %s' % env.releases_dir, use_sudo=True)
-    put('%s/*' % supervisor_conf_dir, '/etc/supervisor/conf.d', use_sudo=True)
+def supervisor():
+    supervisor_conf_dir = "%s/conf/supervisor/*" % env.current_dir
+    sudo("cp %s %s" % (supervisor_conf_dir, '/etc/supervisor/conf.d/'))
     sudo('sudo supervisorctl reread')
     sudo('sudo supervisorctl update')
     sudo('sudo sysv-rc-conf supervisor on')
-    sudo('supervisorctl reload admin')
+    sudo('supervisorctl reload')
 
 
 @roles('be')
