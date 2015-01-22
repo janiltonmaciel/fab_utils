@@ -3,7 +3,7 @@
 # import system
 import os
 import re
-from fabric.api import env, task, roles, execute, run, put
+from fabric.api import env, task, roles, execute, run, put, cd
 from fabric.contrib.files import exists
 from fabric.operations import sudo
 
