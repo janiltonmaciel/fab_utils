@@ -19,7 +19,7 @@ def init():
     """
         Setup inicial de deploy
     """
-    run('mkdir -p %s' % env.releases_dir)
+    run('mkdir -p %(releases_dir)s' % env)
     execute(cleanup)
 
 
@@ -40,7 +40,7 @@ def symlink(timestamp):
     """
         Cria link simbolico para o release current
     """
-    run('rm -f %s' % env.current_dir)
+    run('rm -f %(current_dir)s' % env)
     run('ln -s %s %s' % (os.path.join(env.releases_dir, timestamp), env.current_dir))
 
 
@@ -50,7 +50,7 @@ def releases():
     """
         Retorna todos os releases
     """
-    result = run('ls %s' % env.releases_dir)
+    result = run('ls %(releases_dir)s' % env)
     releases_list = re.split('\s+', result)
     releases_list.sort(reverse=True)
     return releases_list
@@ -62,7 +62,7 @@ def current():
     """
         Retorna o release current
     """
-    result = run("ls -ld %s | awk '{print $11}'" % env.current_dir)
+    result = run("ls -ld %(current_dir)s | awk '{print $11}'" % env)
     return result.split('/')[-1]
 
 
@@ -97,20 +97,21 @@ def rollback():
 @roles('be')
 def clone_project(timestamp):
     if exists(env.source_dir + '/.git'):
-        run('cd %s && git fetch --all' % env.source_dir)
+        run('cd %(source_dir)s && git fetch --all' % env)
     else:
-        run('git clone %s %s' % (env.repository_url, env.source_dir))
+        run('git clone %(repository_url)s %(source_dir)s' % env)
 
-    run('cd %s && git reset --hard && git pull origin master' % env.source_dir)
-    run('cd %s && git archive --format=tar --prefix=%s/ HEAD | (cd %s && tar xf -)' % (env.source_dir, timestamp, env.releases_dir))
+    with cd(env.source_dir):
+        run('git reset --hard && git pull origin master')
+        run('git archive --format=tar --prefix=%s/ HEAD | (cd %s && tar xf -)' % (timestamp, env.releases_dir))
 
 
 @task
 @roles('be')
 def pip_install():
     if not exists(env.virtualenv_dir):
-        run('virtualenv %s' % env.virtualenv_dir)
-    run('source %s/bin/activate; pip install -r %s/requirements.txt --no-deps' % (env.virtualenv_dir, env.current_dir))
+        run('virtualenv %(virtualenv_dir)s' % env)
+    run('source %(virtualenv_dir)s/bin/activate; pip install -r %(current_dir)s/requirements.txt --no-deps' % env)
 
 
 @task
@@ -144,9 +145,21 @@ def create_directories(directories=None):
 
 @task
 @roles('be')
-def create_user():
+def create_user(user, isSudo=True):
     env.user = 'root'
-    sudo('adduser dreasy')
-    sudo('gpasswd -a dreasy sudo')
-    sudo('mkdir /opt/dreasy')
-    sudo('chown dreasy:dreasy /opt/dreasy')
+    sudo('adduser %s' % user)
+    sudo('mkdir /opt/%s' % user)
+    sudo('chown %s:%s /opt/dreasy' % (user, user))
+    if isSudo:
+        sudo('gpasswd -a %s sudo' % user)
+
+
+@task
+@roles('be')
+def provision():
+    temp_dir = "/tmp/"
+    provision_name = "provision.sh"
+    put("%s/%s" % (env.provision_dir, provision_name), temp_dir)
+
+    with cd(temp_dir):
+        sudo("chmod +x %s && ./%s" % (provision_name, provision_name))
