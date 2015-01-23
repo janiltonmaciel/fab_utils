@@ -117,7 +117,9 @@ def pip_install():
 @task
 @roles('be')
 def nginx():
-    nginx_current_conf = "%s/conf/nginx/*" % env.current_dir
+    nginx_conf = "%s/conf/nginx/nginx.conf" % env.current_dir
+    sudo("cp %s /etc/nginx/" % nginx_conf)
+
     sudo("cp %s %s" % (nginx_current_conf, env.nginx_dir))
     sudo("nginx -c %s/nginx.conf" % env.nginx_dir)
 
@@ -125,8 +127,12 @@ def nginx():
 @task
 @roles('be')
 def supervisor():
-    supervisor_conf_dir = "%s/conf/supervisor/*" % env.current_dir
-    sudo("cp %s %s" % (supervisor_conf_dir, '/etc/supervisor/conf.d/'))
+    supervisor_conf = "%s/conf/supervisor/supervisor.conf" % env.current_dir
+    sudo("cp %s /etc/supervisor/" % supervisor_conf)
+
+    supervisor_inc_dir = "%s/conf/supervisor/*.ini" % env.current_dir
+    sudo("cp %s /etc/supervisor/conf.d/" % supervisor_inc_dir)
+
     sudo('sudo supervisorctl reread')
     sudo('sudo supervisorctl update')
     sudo('sudo sysv-rc-conf supervisor on')

@@ -8,6 +8,7 @@ class Environment(Task):
 
     def run(self, *args):
         env.shell = "/bin/bash -l -i -c"
+        env.path = '/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:/opt/local/bin:/opt/local/sbin'
         env.name = self.name
         env.roledefs = self.roledefs
 
