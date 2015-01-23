@@ -117,10 +117,8 @@ def pip_install():
 @task
 @roles('be')
 def nginx():
-    nginx_conf = "%s/conf/nginx/nginx.conf" % env.current_dir
+    nginx_conf = "%(current_dir)s/conf/nginx/nginx.conf" % env
     sudo("cp %s /etc/nginx/" % nginx_conf)
-
-    sudo("cp %s %s" % (nginx_current_conf, env.nginx_dir))
     sudo("nginx -c %s/nginx.conf" % env.nginx_dir)
 
 
