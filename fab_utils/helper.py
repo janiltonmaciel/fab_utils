@@ -125,7 +125,7 @@ def nginx():
 @task
 @roles('be')
 def supervisor():
-    supervisor_conf = "%s/conf/supervisor/supervisor.conf" % env.current_dir
+    supervisor_conf = "%s/conf/supervisor/supervisord.conf" % env.current_dir
     sudo("cp %s /etc/supervisor/" % supervisor_conf)
 
     supervisor_inc_dir = "%s/conf/supervisor/*.ini" % env.current_dir
