@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='fab_utils',
-    version='0.7.0',
+    version='0.8.0',
     author='Janilton Maciel',
     author_email='janilton@outlook.com',
     packages=['fab_utils'],
