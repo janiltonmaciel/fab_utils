@@ -21,7 +21,7 @@ def init():
     """
     run('mkdir -p %(releases_dir)s' % env)
     execute(cleanup)
-
+    execute(create_directories)
 
 @task
 @roles('be')
@@ -31,7 +31,9 @@ def cleanup():
     """
     remove = releases()[env.keep:]
     if remove:
-        run('rm -rf %s/%s' % (env.releases_dir, ','.join(remove)))
+        with cd(env.releases_dir):
+            for release in remove:
+                run('rm -r %s' % release)
 
 
 @task
@@ -130,11 +132,7 @@ def supervisor():
 
     supervisor_inc_dir = "%s/conf/supervisor/*.ini" % env.current_dir
     sudo("cp %s /etc/supervisor/conf.d/" % supervisor_inc_dir)
-
-    sudo('sudo supervisorctl reread')
-    sudo('sudo supervisorctl update')
-    sudo('sudo sysv-rc-conf supervisor on')
-    sudo('supervisorctl reload')
+    sudo("service supervisor restart")
 
 
 @roles('be')
