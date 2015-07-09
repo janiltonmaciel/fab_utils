@@ -42,7 +42,8 @@ def symlink(timestamp):
     """
         Cria link simbolico para o release current
     """
-    run('rm -r %(current_dir)s' % env)
+    if exists(env.current_dir):
+        run('rm -r %(current_dir)s' % env)
     run('ln -s %s %s' % (os.path.join(env.releases_dir, timestamp), env.current_dir))
 
 
