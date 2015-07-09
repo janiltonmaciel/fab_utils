@@ -151,7 +151,7 @@ def create_user(user, isSudo=True):
     env.user = 'root'
     sudo('adduser %s' % user)
     sudo('mkdir /opt/%s' % user)
-    sudo('chown %s:%s /opt/dreasy' % (user, user))
+    sudo('chown %s:%s /opt/%s' % (user, user, user))
     if isSudo:
         sudo('gpasswd -a %s sudo' % user)
 
