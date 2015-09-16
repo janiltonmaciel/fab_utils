@@ -111,10 +111,13 @@ def clone_project(timestamp):
 
 @task
 @roles('be')
-def pip_install():
+def pip_install(no_deps=True):
     if not exists(env.virtualenv_dir):
         run('virtualenv %(virtualenv_dir)s' % env)
-    run('source %(virtualenv_dir)s/bin/activate; pip install -r %(current_dir)s/requirements.txt --no-deps' % env)
+        if no_deps:
+            run('source %(virtualenv_dir)s/bin/activate; pip install -r %(current_dir)s/requirements.txt --no-deps' % env)
+        else:
+            run('source %(virtualenv_dir)s/bin/activate; pip install -r %(current_dir)s/requirements.txt' % env)
 
 
 @task
