@@ -98,14 +98,14 @@ def rollback():
 
 @task
 @roles('be')
-def clone_project(timestamp):
+def clone_project(timestamp, branch="master"):
     if exists(env.source_dir + '/.git'):
         run('cd %(source_dir)s && git fetch --all' % env)
     else:
         run('git clone %(repository_url)s %(source_dir)s' % env)
 
     with cd(env.source_dir):
-        run('git reset --hard && git pull origin master')
+        run('git reset --hard && git pull origin %s' % branch)
         run('git archive --format=tar --prefix=%s/ HEAD | (cd %s && tar xf -)' % (timestamp, env.releases_dir))
 
 
